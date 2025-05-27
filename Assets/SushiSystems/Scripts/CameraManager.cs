@@ -40,7 +40,13 @@ public class CameraManager : MonoBehaviour
     private void Update()
     {
         ApplyMovement();
+
+#if UNITY_EDITOR || UNITY_STANDALONE
+        HandleMouseInput();
+#else
         HandlePlayerInput();
+#endif
+
         ClampPositionAndAngles();
     }
 
@@ -78,20 +84,48 @@ public class CameraManager : MonoBehaviour
         if (movementButtonPressCount == 0)
         {
             if (gameTouches.Count == 1)
-            {
-                //Rotation
                 HandleRotation(gameTouches[0]);
-            }
             else if (gameTouches.Count == 2)
-            {
-                //Pinch Zoom
                 HandlePinchZoom(gameTouches[0], gameTouches[1]);
-            }
         }
         else
         {
             if (gameTouches.Count >= 1)
                 HandleRotation(gameTouches[0]);
+        }
+    }
+
+    private void HandleMouseInput()
+    {
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
+
+        if (Input.GetMouseButton(0))
+        {
+            float deltaX = Input.GetAxis("Mouse X") * rotationSensitivity;
+            float deltaY = Input.GetAxis("Mouse Y") * rotationSensitivity;
+
+            transform.Rotate(0f, deltaX, 0f, Space.World);
+
+            Vector3 camEuler = cam.transform.localEulerAngles;
+            float desiredX = camEuler.x - deltaY;
+            desiredX = NormalizeAngle(desiredX);
+            desiredX = Mathf.Clamp(desiredX, minVerticalAngle, maxVerticalAngle);
+            cam.transform.localEulerAngles = new Vector3(desiredX, camEuler.y, camEuler.z);
+        }
+
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (Mathf.Abs(scroll) > 0.01f)
+        {
+            float zoomAmountY = Mathf.Sin(Mathf.Deg2Rad * 40f) * scroll * zoomSensitivity * 100f * Time.deltaTime;
+            float zoomAmountZ = Mathf.Cos(Mathf.Deg2Rad * 40f) * scroll * zoomSensitivity * 100f * Time.deltaTime;
+
+            Vector3 localPos = cam.transform.localPosition;
+            float newY = Mathf.Clamp(localPos.y - zoomAmountY, minZoomDistance, maxZoomDistance);
+            float zoomedYRatio = newY / localPos.y;
+            float newZ = localPos.z * zoomedYRatio;
+
+            cam.transform.localPosition = new Vector3(localPos.x, newY, newZ);
         }
     }
 

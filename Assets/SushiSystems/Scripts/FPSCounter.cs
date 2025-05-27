@@ -17,6 +17,8 @@ public class FPSCounter : MonoBehaviour
     {
         fpsText = GetComponent<TextMeshProUGUI>();
         systemText.text = "Device Model: " + SystemInfo.deviceModel + "\nRefresh Rate: " + Screen.currentResolution.refreshRate;
+
+        Application.targetFrameRate = 60;
     }
 
     #endregion
