@@ -1,0 +1,11 @@
+Copyright (c) 2025 Mustafa Garip
+
+This project is intended for educational and non-commercial use only.
+
+Permission is granted to students, educators, and academic institutions to use, modify, and distribute this project solely for learning, teaching, or research purposes.
+
+Commercial use, resale, or integration into proprietary software or platforms is strictly prohibited without written permission from the author.
+
+This software is provided "as is", without warranty of any kind.
+
+Contact: garipm@mef.edu.tr
